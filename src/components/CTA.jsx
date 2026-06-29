@@ -1,9 +1,11 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
 import { IconPhone } from '../assets/icons'
 import { business } from '../data/content'
 
 export default function CTA() {
-  const [ref, visible] = useScrollReveal()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   const handleCall = () => {
     window.location.href = `tel:${business.phone}`
@@ -13,22 +15,58 @@ export default function CTA() {
     <section className="section cta-section" ref={ref}>
       <div className="cta-bg-pattern" />
       <div className="container">
-        <div className={`cta-card ${visible ? 'visible' : ''}`}>
-          <span className="section-label" style={{ color: 'rgba(255,255,255,0.7)' }}>
+        <motion.div
+          className="cta-card"
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0, 1] }}
+        >
+          <motion.span
+            className="section-label"
+            style={{ color: 'rgba(255,255,255,0.7)' }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.15, duration: 0.5 }}
+          >
             Agenda tu servicio
-          </span>
-          <h2 className="cta-title">¿Problemas con tu auto?</h2>
-          <p className="cta-text">
+          </motion.span>
+          <motion.h2
+            className="cta-title"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.25, duration: 0.6 }}
+          >
+            ¿Problemas con tu auto?
+          </motion.h2>
+          <motion.p
+            className="cta-text"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.35, duration: 0.6 }}
+          >
             Llámanos ahora y agenda una revisión gratuita. Te atenderemos en tu ubicación en {business.serviceArea}.
-          </p>
-          <button className="btn-cta cta-big" onClick={handleCall}>
+          </motion.p>
+          <motion.button
+            className="btn-cta cta-big"
+            onClick={handleCall}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+          >
             <IconPhone size={24} />
             {business.phoneDisplay}
-          </button>
-          <p className="cta-small">
+          </motion.button>
+          <motion.p
+            className="cta-small"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
             Servicio disponible de lunes a sábado · Diagnóstico sin costo
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
 
       <style>{`
@@ -58,14 +96,6 @@ export default function CTA() {
           position: relative;
           max-width: 600px;
           margin: 0 auto;
-          opacity: 0;
-          transform: translateY(30px) scale(0.98);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .cta-card.visible {
-          opacity: 1;
-          transform: translateY(0) scale(1);
         }
 
         .cta-title {

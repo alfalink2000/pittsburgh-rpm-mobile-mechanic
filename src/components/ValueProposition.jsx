@@ -1,4 +1,6 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { motion } from 'framer-motion'
+import { useInView } from 'framer-motion'
+import { useRef } from 'react'
 import { IconLocation, IconDiagnostic, IconGuarantee } from '../assets/icons'
 import { valueProps } from '../data/content'
 
@@ -8,39 +10,57 @@ const iconMap = {
   guarantee: IconGuarantee,
 }
 
+function ValueCard({ prop, idx }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+  const Icon = iconMap[prop.icon]
+
+  return (
+    <motion.article
+      ref={ref}
+      className="value-card glass"
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: idx * 0.15, ease: [0.25, 0.1, 0, 1] }}
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+    >
+      <motion.div
+        className="value-icon-wrap"
+        whileHover={{ scale: 1.15, rotate: 5 }}
+        transition={{ type: 'spring', stiffness: 300 }}
+      >
+        <Icon size={44} />
+      </motion.div>
+      <h3 className="value-card-title">{prop.title}</h3>
+      <p className="value-card-desc">{prop.description}</p>
+    </motion.article>
+  )
+}
+
 export default function ValueProposition() {
-  const [ref, visible] = useScrollReveal()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
     <section className="section value-prop" id="about" ref={ref}>
       <div className="container">
-        <div className={`value-header ${visible ? 'visible' : ''}`}>
+        <motion.div
+          className="value-header"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease: [0.25, 0.1, 0, 1] }}
+        >
           <span className="section-label">Por qué elegirnos</span>
           <h2 className="section-title">Mecánico de confianza a tu puerta</h2>
           <p className="section-subtitle">
             No somos un taller más. Llevamos el taller a tu casa u oficina con estándares profesionales y precios justos.
           </p>
-        </div>
+        </motion.div>
 
         <div className="value-grid">
-          {valueProps.map((prop, idx) => {
-            const [cardRef, cardVisible] = useScrollReveal()
-            const Icon = iconMap[prop.icon]
-            return (
-              <article
-                key={idx}
-                className={`value-card glass ${cardVisible ? 'visible' : ''}`}
-                ref={cardRef}
-                style={{ transitionDelay: `${idx * 0.12}s` }}
-              >
-                <div className="value-icon-wrap">
-                  <Icon size={44} />
-                </div>
-                <h3 className="value-card-title">{prop.title}</h3>
-                <p className="value-card-desc">{prop.description}</p>
-              </article>
-            )
-          })}
+          {valueProps.map((prop, idx) => (
+            <ValueCard key={idx} prop={prop} idx={idx} />
+          ))}
         </div>
       </div>
 
@@ -48,14 +68,6 @@ export default function ValueProposition() {
         .value-header {
           text-align: center;
           margin-bottom: 56px;
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .value-header.visible {
-          opacity: 1;
-          transform: translateY(0);
         }
 
         .value-header .section-subtitle {
@@ -71,19 +83,11 @@ export default function ValueProposition() {
         .value-card {
           padding: 40px 32px;
           text-align: center;
-          opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.7s ease, transform 0.7s ease, box-shadow var(--transition), transform var(--transition);
           cursor: default;
-        }
-
-        .value-card.visible {
-          opacity: 1;
-          transform: translateY(0);
+          transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .value-card:hover {
-          transform: translateY(-6px) !important;
           box-shadow: var(--shadow-lg);
         }
 
@@ -97,11 +101,6 @@ export default function ValueProposition() {
           background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(13, 33, 55, 0.05));
           color: var(--color-accent);
           margin-bottom: 24px;
-          transition: transform var(--transition);
-        }
-
-        .value-card:hover .value-icon-wrap {
-          transform: scale(1.1);
         }
 
         .value-card-title {

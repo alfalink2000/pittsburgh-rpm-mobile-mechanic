@@ -1,59 +1,113 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { lazy, Suspense } from 'react'
+import { motion } from 'framer-motion'
 import { IconTruck, IconPhone } from '../assets/icons'
 import { hero, business } from '../data/content'
 
-export default function Hero() {
-  const [ref, visible] = useScrollReveal(0.1)
+const ThreeBackground = lazy(() => import('./ThreeBackground'))
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+  },
+}
+
+const item = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 0.1, 0, 1] } },
+}
+
+const visualItem = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.9, ease: [0.25, 0.1, 0, 1], delay: 0.2 } },
+}
+
+export default function Hero() {
   const handleCall = () => {
     window.location.href = `tel:${business.phone}`
   }
 
   return (
-    <section className="hero" ref={ref}>
+    <section className="hero">
+      <Suspense fallback={null}>
+        <ThreeBackground />
+      </Suspense>
+
       <div className="hero-bg">
         <div className="hero-blob hero-blob-1" />
         <div className="hero-blob hero-blob-2" />
       </div>
 
-      <div className="container hero-inner">
-        <div className={`hero-content ${visible ? 'visible' : ''}`}>
-          <span className="hero-badge">Profesional certificado</span>
-          <h1 className="hero-title">
+      <motion.div
+        className="container hero-inner"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        <div className="hero-content">
+          <motion.span className="hero-badge" variants={item}>
+            Profesional certificado
+          </motion.span>
+          <motion.h1 className="hero-title" variants={item}>
             <span className="hero-name">{business.name}</span>
             <span className="hero-tagline">{hero.tagline}</span>
-          </h1>
-          <p className="hero-subtitle">{hero.subtitle}</p>
-          <div className="hero-actions">
-            <button className="btn-cta" onClick={handleCall}>
+          </motion.h1>
+          <motion.p className="hero-subtitle" variants={item}>
+            {hero.subtitle}
+          </motion.p>
+          <motion.div className="hero-actions" variants={item}>
+            <motion.button
+              className="btn-cta"
+              onClick={handleCall}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            >
               <IconPhone size={20} />
               {hero.cta}
-            </button>
-            <a href="#services" className="btn-outline">
+            </motion.button>
+            <motion.a
+              href="#services"
+              className="btn-outline"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            >
               Ver servicios
-            </a>
-          </div>
-          <div className="hero-rating">
+            </motion.a>
+          </motion.div>
+          <motion.div className="hero-rating" variants={item}>
             <div className="hero-stars">
               {[...Array(5)].map((_, i) => (
-                <svg key={i} width="16" height="16" viewBox="0 0 20 20" fill="#f4b400" xmlns="http://www.w3.org/2000/svg">
+                <motion.svg
+                  key={i}
+                  width="16" height="16" viewBox="0 0 20 20" fill="#f4b400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 1 + i * 0.12, type: 'spring', stiffness: 200 }}
+                >
                   <path d="M10 1L12.9 6.9L19 7.8L14.5 12.1L15.8 18.3L10 15.2L4.2 18.3L5.5 12.1L1 7.8L7.1 6.9L10 1Z"/>
-                </svg>
+                </motion.svg>
               ))}
             </div>
             <span className="hero-rating-text">
               <strong>5.0</strong> · {business.reviewCount} reseñas en Google
             </span>
-          </div>
+          </motion.div>
         </div>
 
-        <div className={`hero-visual ${visible ? 'visible' : ''}`}>
+        <motion.div className="hero-visual" variants={visualItem}>
           <div className="hero-illustration">
-            <IconTruck size={300} />
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <IconTruck size={300} />
+            </motion.div>
             <div className="hero-orb" />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <style>{`
         .hero {
@@ -109,17 +163,12 @@ export default function Hero() {
           grid-template-columns: 1fr 1fr;
           gap: 60px;
           align-items: center;
+          z-index: 2;
         }
 
         .hero-content {
-          opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .hero-content.visible {
-          opacity: 1;
-          transform: translateY(0);
+          position: relative;
+          z-index: 2;
         }
 
         .hero-badge {
@@ -214,14 +263,8 @@ export default function Hero() {
           display: flex;
           justify-content: center;
           align-items: center;
-          opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
-        }
-
-        .hero-visual.visible {
-          opacity: 1;
-          transform: translateY(0);
+          position: relative;
+          z-index: 2;
         }
 
         .hero-illustration {

@@ -1,34 +1,117 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { motion, useInView } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
 import { IconStar } from '../assets/icons'
 import { socialProof, business } from '../data/content'
 
+function AnimatedRating() {
+  const [count, setCount] = useState(0)
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+
+  useEffect(() => {
+    if (!isInView) return
+    let start = 0
+    const end = socialProof.rating
+    const duration = 1500
+    const step = 50
+    const totalSteps = duration / step
+    const increment = end / totalSteps
+
+    const timer = setInterval(() => {
+      start += increment
+      if (start >= end) {
+        setCount(end)
+        clearInterval(timer)
+      } else {
+        setCount(start)
+      }
+    }, step)
+
+    return () => clearInterval(timer)
+  }, [isInView])
+
+  return (
+    <span ref={ref} className="sp-rating-number">
+      {count.toFixed(1)}
+    </span>
+  )
+}
+
 export default function SocialProof() {
-  const [ref, visible] = useScrollReveal()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
     <section className="section social-proof" ref={ref}>
       <div className="container">
-        <div className={`sp-card ${visible ? 'visible' : ''}`}>
-          <div className="sp-stars">
+        <motion.div
+          className="sp-card"
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0, 1] }}
+        >
+          <motion.div
+            className="sp-stars"
+            initial="hidden"
+            animate={isInView ? 'visible' : 'hidden'}
+            variants={{
+              visible: {
+                transition: { staggerChildren: 0.12, delayChildren: 0.3 },
+              },
+            }}
+          >
             {[...Array(5)].map((_, i) => (
-              <span key={i} className="sp-star">
+              <motion.span
+                key={i}
+                className="sp-star"
+                variants={{
+                  hidden: { scale: 0, rotate: -180 },
+                  visible: { scale: 1, rotate: 0, transition: { type: 'spring', stiffness: 200 } },
+                }}
+              >
                 <IconStar size={28} />
-              </span>
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
+
           <div className="sp-rating-text">
-            <span className="sp-rating-number">{socialProof.rating}</span>
+            <AnimatedRating />
             <span className="sp-rating-label">/ 5.0</span>
           </div>
-          <p className="sp-review-count">
-            {socialProof.reviewCount} reseñas en Google
-          </p>
-          <blockquote className="sp-testimonial">
-            {socialProof.testimonial}
-          </blockquote>
-          <cite className="sp-author">{socialProof.testimonialAuthor}</cite>
 
-          <div className="sp-rs">
+          <motion.p
+            className="sp-review-count"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            {socialProof.reviewCount} reseñas en Google
+          </motion.p>
+
+          <motion.blockquote
+            className="sp-testimonial"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 1, duration: 0.6, ease: [0.25, 0.1, 0, 1] }}
+          >
+            {socialProof.testimonial}
+          </motion.blockquote>
+
+          <motion.cite
+            className="sp-author"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ delay: 1.2, duration: 0.5 }}
+          >
+            {socialProof.testimonialAuthor}
+          </motion.cite>
+
+          <motion.div
+            className="sp-rs"
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 1.4, duration: 0.5 }}
+          >
             <a
               href={`https://search.google.com/local/reviews?q=${encodeURIComponent(business.name)}`}
               target="_blank"
@@ -38,8 +121,8 @@ export default function SocialProof() {
               <svg width="16" height="16" viewBox="0 0 48 48" fill="currentColor"><path d="M44 24c0-11-9-20-20-20S4 13 4 24s9 20 20 20 20-9 20-20z"/></svg>
               Deja tu reseña
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       <style>{`
@@ -63,14 +146,6 @@ export default function SocialProof() {
           max-width: 600px;
           margin: 0 auto;
           position: relative;
-          opacity: 0;
-          transform: translateY(30px) scale(0.98);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .sp-card.visible {
-          opacity: 1;
-          transform: translateY(0) scale(1);
         }
 
         .sp-stars {
@@ -82,19 +157,6 @@ export default function SocialProof() {
 
         .sp-star {
           color: var(--color-star);
-          animation: star-pop 0.4s ease backwards;
-        }
-
-        .sp-star:nth-child(1) { animation-delay: 0.2s; }
-        .sp-star:nth-child(2) { animation-delay: 0.35s; }
-        .sp-star:nth-child(3) { animation-delay: 0.5s; }
-        .sp-star:nth-child(4) { animation-delay: 0.65s; }
-        .sp-star:nth-child(5) { animation-delay: 0.8s; }
-
-        @keyframes star-pop {
-          0% { transform: scale(0); opacity: 0; }
-          60% { transform: scale(1.3); }
-          100% { transform: scale(1); opacity: 1; }
         }
 
         .sp-rating-text {

@@ -1,4 +1,6 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { motion } from 'framer-motion'
+import { useInView } from 'framer-motion'
+import { useRef } from 'react'
 import { IconOil, IconBrakes, IconBattery, IconDiagnostic, IconExhaust, IconSuspension } from '../assets/icons'
 import { services } from '../data/content'
 
@@ -11,42 +13,60 @@ const iconMap = {
   suspension: IconSuspension,
 }
 
+function ServiceCard({ service, idx }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-60px' })
+  const Icon = iconMap[service.icon]
+
+  return (
+    <motion.article
+      ref={ref}
+      className="service-card glass"
+      initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
+      animate={isInView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.5, delay: idx * 0.08, ease: [0.25, 0.1, 0, 1] }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+    >
+      <motion.div
+        className="service-icon"
+        whileHover={{ rotate: 15 }}
+        transition={{ type: 'spring', stiffness: 200 }}
+      >
+        <Icon size={36} />
+      </motion.div>
+      <div className="service-info">
+        <h3 className="service-title">{service.title}</h3>
+        <p className="service-desc">{service.description}</p>
+      </div>
+      <div className="service-price">{service.price}</div>
+    </motion.article>
+  )
+}
+
 export default function Services() {
-  const [ref, visible] = useScrollReveal()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
     <section className="section services" id="services" ref={ref}>
       <div className="container">
-        <div className={`services-header ${visible ? 'visible' : ''}`}>
+        <motion.div
+          className="services-header"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease: [0.25, 0.1, 0, 1] }}
+        >
           <span className="section-label">Servicios</span>
           <h2 className="section-title">Reparaciones con precios claros</h2>
           <p className="section-subtitle">
             Presupuesto sin compromiso. Solo pagas cuando el trabajo esté terminado y aprobado.
           </p>
-        </div>
+        </motion.div>
 
         <div className="services-grid">
-          {services.map((service, idx) => {
-            const [cardRef, cardVisible] = useScrollReveal()
-            const Icon = iconMap[service.icon]
-            return (
-              <article
-                key={idx}
-                className={`service-card glass ${cardVisible ? 'visible' : ''}`}
-                ref={cardRef}
-                style={{ transitionDelay: `${idx * 0.08}s` }}
-              >
-                <div className="service-icon">
-                  <Icon size={36} />
-                </div>
-                <div className="service-info">
-                  <h3 className="service-title">{service.title}</h3>
-                  <p className="service-desc">{service.description}</p>
-                </div>
-                <div className="service-price">{service.price}</div>
-              </article>
-            )
-          })}
+          {services.map((service, idx) => (
+            <ServiceCard key={idx} service={service} idx={idx} />
+          ))}
         </div>
       </div>
 
@@ -58,14 +78,6 @@ export default function Services() {
         .services-header {
           text-align: center;
           margin-bottom: 48px;
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .services-header.visible {
-          opacity: 1;
-          transform: translateY(0);
         }
 
         .services-header .section-subtitle {
@@ -83,14 +95,8 @@ export default function Services() {
           align-items: center;
           gap: 16px;
           padding: 20px 24px;
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.6s ease, transform 0.6s ease, box-shadow var(--transition);
-        }
-
-        .service-card.visible {
-          opacity: 1;
-          transform: translateY(0);
+          cursor: default;
+          transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .service-card:hover {

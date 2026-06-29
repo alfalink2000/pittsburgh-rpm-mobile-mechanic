@@ -1,8 +1,10 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
 import { business } from '../data/content'
 
 export default function Footer() {
-  const [ref, visible] = useScrollReveal()
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-40px' })
 
   const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(
     `${business.name}, ${business.address.street}, ${business.address.city}, ${business.address.state}`
@@ -10,23 +12,43 @@ export default function Footer() {
 
   return (
     <footer className="footer" ref={ref}>
-      <div className={`footer-inner container ${visible ? 'visible' : ''}`}>
+      <motion.div
+        className="footer-inner container"
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.7, ease: [0.25, 0.1, 0, 1] }}
+      >
         <div className="footer-main">
-          <div className="footer-brand">
+          <motion.div
+            className="footer-brand"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1, duration: 0.5 }}
+          >
             <h3 className="footer-name">{business.name}</h3>
             <p className="footer-desc">
               Mecánico móvil profesional en {business.serviceArea}. Reparación y mantenimiento a domicilio con garantía.
             </p>
-          </div>
+          </motion.div>
 
           <div className="footer-links">
-            <div className="footer-group">
+            <motion.div
+              className="footer-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               <h4 className="footer-group-title">Contacto</h4>
               <a href={`tel:${business.phone}`} className="footer-link">{business.phoneDisplay}</a>
               <a href={`mailto:${business.email}`} className="footer-link">{business.email}</a>
-            </div>
+            </motion.div>
 
-            <div className="footer-group">
+            <motion.div
+              className="footer-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
               <h4 className="footer-group-title">Dirección</h4>
               <p className="footer-text">
                 {business.address.street}<br />
@@ -35,21 +57,31 @@ export default function Footer() {
               <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="footer-link">
                 Ver en Google Maps →
               </a>
-            </div>
+            </motion.div>
 
-            <div className="footer-group">
+            <motion.div
+              className="footer-group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
               <h4 className="footer-group-title">Horario</h4>
               <p className="footer-text">{business.hours.weekdays}</p>
               <p className="footer-text">{business.hours.saturday}</p>
               <p className="footer-text">{business.hours.sunday}</p>
-            </div>
+            </motion.div>
           </div>
         </div>
 
-        <div className="footer-bottom">
+        <motion.div
+          className="footer-bottom"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
           <p>&copy; {new Date().getFullYear()} {business.name}. Todos los derechos reservados.</p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <style>{`
         .footer {
@@ -60,14 +92,6 @@ export default function Footer() {
         .footer-inner {
           padding-top: 64px;
           padding-bottom: 32px;
-          opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .footer-inner.visible {
-          opacity: 1;
-          transform: translateY(0);
         }
 
         .footer-main {
