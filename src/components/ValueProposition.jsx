@@ -1,8 +1,7 @@
-import { motion } from 'framer-motion'
-import { useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
+import { valueProps, business } from '../data/content'
 import { IconLocation, IconDiagnostic, IconGuarantee } from '../assets/icons'
-import { valueProps } from '../data/content'
 
 const iconMap = {
   location: IconLocation,
@@ -18,21 +17,21 @@ function ValueCard({ prop, idx }) {
   return (
     <motion.article
       ref={ref}
-      className="value-card glass"
+      className='value-card'
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: idx * 0.15, ease: [0.25, 0.1, 0, 1] }}
       whileHover={{ y: -8, transition: { duration: 0.3 } }}
     >
       <motion.div
-        className="value-icon-wrap"
+        className='value-icon-wrap'
         whileHover={{ scale: 1.15, rotate: 5 }}
         transition={{ type: 'spring', stiffness: 300 }}
       >
         <Icon size={44} />
       </motion.div>
-      <h3 className="value-card-title">{prop.title}</h3>
-      <p className="value-card-desc">{prop.description}</p>
+      <h3 className='value-card-title'>{prop.title}</h3>
+      <p className='value-card-desc'>{prop.description}</p>
     </motion.article>
   )
 }
@@ -42,22 +41,22 @@ export default function ValueProposition() {
   const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="section value-prop" id="about" ref={ref}>
-      <div className="container">
+    <section className='section' id='about' ref={ref}>
+      <div className='container'>
         <motion.div
-          className="value-header"
+          className='value-header'
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.25, 0.1, 0, 1] }}
         >
-          <span className="section-label">Por qué elegirnos</span>
-          <h2 className="section-title">Mecánico de confianza a tu puerta</h2>
-          <p className="section-subtitle">
-            No somos un taller más. Llevamos el taller a tu casa u oficina con estándares profesionales y precios justos.
+          <span className='section-label'>Por que elegirnos</span>
+          <h2 className='section-title'>Mecanico de confianza a tu puerta</h2>
+          <p className='section-subtitle'>
+            No somos un taller mas. Llevamos el taller a tu casa u oficina con estandares profesionales y precios justos.
           </p>
         </motion.div>
 
-        <div className="value-grid">
+        <div className='value-grid'>
           {valueProps.map((prop, idx) => (
             <ValueCard key={idx} prop={prop} idx={idx} />
           ))}
@@ -69,28 +68,30 @@ export default function ValueProposition() {
           text-align: center;
           margin-bottom: 56px;
         }
-
         .value-header .section-subtitle {
           margin: 0 auto;
         }
-
         .value-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 28px;
         }
-
         .value-card {
           padding: 40px 32px;
           text-align: center;
           cursor: default;
-          transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 24px;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .value-card:hover {
-          box-shadow: var(--shadow-lg);
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 77, 0, 0.3);
+          box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
         }
-
         .value-icon-wrap {
           display: inline-flex;
           align-items: center;
@@ -98,31 +99,27 @@ export default function ValueProposition() {
           width: 72px;
           height: 72px;
           border-radius: 20px;
-          background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(13, 33, 55, 0.05));
-          color: var(--color-accent);
+          background: linear-gradient(135deg, rgba(255, 77, 0, 0.15), rgba(255, 255, 255, 0.05));
+          color: #ff4d00;
           margin-bottom: 24px;
         }
-
         .value-card-title {
           font-family: var(--font-display);
           font-size: 1.3rem;
           font-weight: 700;
           margin-bottom: 12px;
-          color: var(--color-primary);
+          color: #ffffff;
         }
-
         .value-card-desc {
           font-size: 0.92rem;
-          color: var(--color-text-light);
+          color: rgba(255, 255, 255, 0.6);
           line-height: 1.7;
         }
-
         @media (max-width: 768px) {
           .value-grid {
             grid-template-columns: 1fr;
             gap: 20px;
           }
-
           .value-card {
             padding: 32px 24px;
           }

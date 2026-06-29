@@ -1,3 +1,4 @@
+import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import ValueProposition from './components/ValueProposition'
 import Services from './components/Services'
@@ -9,6 +10,7 @@ import Footer from './components/Footer'
 export default function App() {
   return (
     <>
+      <Navbar />
       <Hero />
       <ValueProposition />
       <Services />
